@@ -53,7 +53,6 @@ with open('Attributes.csv') as csv_file:
             val = row[2]
             i = row[3]
             if isinstance(name, tuple):
-                A
                 name = name[0]
             if t == "O":
                 obj = objects.get(i)
