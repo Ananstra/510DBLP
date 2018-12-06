@@ -2,10 +2,14 @@ import couchdb
 import csv
 import config
 
+# Server setup block
 couchserver = couchdb.Server("http://%s:%s@%s/" % (config.user, config.password, config.server))
+
+# Parse CSV Block
 objects = {}
 links = {}
 
+# Read in object IDS
 with open('Objects.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -17,6 +21,7 @@ with open('Objects.csv') as csv_file:
             objects[row[0]] = {"_id":row[0]}
             line_count += 1
 
+# Read in link IDS, sources, targets
 with open('Links.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -28,7 +33,7 @@ with open('Links.csv') as csv_file:
             links[row[0]] = {"_id": row[0], "o1":row[1], "o2":row[2]}
             line_count += 1
 
-
+# Read in attributes and and apply them to appropriate objects.
 with open('Attributes.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -58,10 +63,12 @@ with open('Attributes.csv') as csv_file:
 
             line_count += 1
 
+# Flatten links into objects, bidirectionally
 for link_id, link in links.items():
     link_type = link["link-type"]
     o1 = link["o1"]
     o2 = link["o2"]
+    # Based on link type, add _id to appropriate collection on both source and target objects.
     if link_type == "editor-of":
         editor = objects[o1]
         if editor.get("editor-of") is None:
@@ -150,9 +157,11 @@ for link_id, link in links.items():
         print("Unknown link type, skipping")
         break
 
+# Break object collection into two lists of documents.
 persons = [v for k,v in objects.items() if v["object-type"] == "person"]
 publications = [v for k,v in objects.items() if v["object-type"] != "person"]
 
+# Open/Create databases
 dbname = "persons"
 if dbname in couchserver:
     persondb = couchserver[dbname]
@@ -165,6 +174,7 @@ if dbname in couchserver:
 else:
     pubdb = couchserver.create(dbname)
 
+# Upload documents in batches of 1000
 for pp in [persons[i:i + 1000] for i in range(0, len(persons), 1000)]:
     persondb.update(pp)
 
