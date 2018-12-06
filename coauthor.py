@@ -38,7 +38,6 @@ def level_one(name):
 
     mango = {
         'selector': {
-            'object-type': 'person',
             'name': name
         },
         'fields': ['author-of'],
@@ -47,36 +46,19 @@ def level_one(name):
 
     papers = list(persondb.find(mango))[0].get("author-of")
     co_authors = set()
-    mango = {
-        'selector': {
-            '_id': {
-                "$in": papers
-            }
-        },
-        'fields': ["authored-by"],
-        'limit': 100
-    }
-    co_id_res = list(pubdb.find(mango))
+
     id_list = []
 
-    for co_ids in co_id_res:
-        ids = co_ids.get("authored-by")
+    for paper in papers:
+        p = pubdb[paper]
+        ids = p["authored-by"]
         id_list.extend(ids)
 
-    mango = {
-        'selector': {
-            '_id': {
-                "$in": id_list
-            }
-        },
-        'fields': ["name"],
-        'limit': 1000,
-    }
-    name_res = persondb.find(mango)
     co_authors = set()
 
-    for n in name_res:
-        co_authors.add(n["name"])
+    for i in id_list:
+        n = persondb[i].get("name")
+        co_authors.add(n)
 
     co_authors.remove(name)
 
@@ -103,4 +85,4 @@ def level_n(name, n):
     levels = level_n_recurse(name, n)
     return levels[n]
 
-print(level_n("Michael Stonebraker", 2))
+print(level_n("David J. DeWitt", 3))
