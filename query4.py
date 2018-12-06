@@ -32,5 +32,6 @@ for proc in res:
     print(len(authors))
     if len(authors) > max_count:
         max_proc = proc
+        max_count = len(authors)
 
-print(max_proc, count)
+print(max_proc, max_count)
