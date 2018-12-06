@@ -34,4 +34,6 @@ for proc in res:
         max_proc = proc
         max_count = len(authors)
 
-print(max_proc, max_count)
+proceedings = pubdb[max_proc["_id"]]
+
+print("Proceeding with most authors is {} with {} distinct authors".format(proceedings["title"], max_count))
