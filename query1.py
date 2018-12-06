@@ -20,7 +20,7 @@ for r in res:
     if authors is None:
         break
     if len(authors) > max_count:
-        max_paper = r
+        max_paper = r.get("_id")
         max_count = len(authors)
 
 paper = pubdb[max_paper]
