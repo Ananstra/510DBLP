@@ -104,8 +104,8 @@ def level_n(name, n):
 done = False
 level = 1
 while not done:
-    start = "Michael J. Franklin"
-    search = "Moshe Y. Vardi"
+    start = "Karen L. Karavanic"
+    search = "Kristin Tufte"
     l = level_n(start, level)
     if len(l) == 0:
         print("Not Found")

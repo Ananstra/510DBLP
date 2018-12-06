@@ -24,12 +24,19 @@ for proc in res:
     if papers is None:
         break
     authors = set()
-    for paper in papers:
-        a = pubdb[paper].get("authored-by")
+
+    requests = list(map(lambda i: {'id': i}, papers))
+
+    _,_,paper_response = pubdb.resource.post_json('_bulk_get', {'docs': requests})
+
+    for paper in paper_response['results']:
+        d = paper.get('docs')[0].get('ok')
+        if d is None:
+            break
+        a = d.get("authored-by")
         if a is None:
             break
         authors.update(a)
-    print(len(authors))
     if len(authors) > max_count:
         max_proc = proc
         max_count = len(authors)
