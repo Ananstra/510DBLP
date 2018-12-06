@@ -13,14 +13,15 @@ mango = {'selector': {'object-type': 'paper'},
 
 res = pubdb.find(mango)
 
-author_counts = {}
+max_paper = None
+max_count = 0
 for r in res:
     authors = r.get("authored-by")
     if authors is None:
         break
-    author_counts[r["_id"]] = len(authors)
-
-max_paper = max(author_counts, key=lambda id: author_counts[id])
+    if len(authors) > max_count:
+        max_paper = r
+        max_count = len(authors)
 
 paper = pubdb[max_paper]
 
