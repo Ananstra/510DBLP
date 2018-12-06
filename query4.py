@@ -20,7 +20,9 @@ max_proc = None
 max_count = 0
 
 for proc in res:
-    papers = proc["proceedings-contents"]
+    papers = proc.get("proceedings-contents")
+    if papers is None:
+        break
     authors = set()
     for paper in papers:
         a = pubdb[paper].get("authored-by")
