@@ -89,7 +89,7 @@ done = False
 level = 1
 while not done:
     start = "Michael J. Franklin"
-    search = "Moshe Vardi"
+    search = "Moshe Y. Vardi"
     l = level_n(start, level)
     if len(l) == 0:
         print("Not Found")

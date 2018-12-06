@@ -30,11 +30,12 @@ def cache_results(name, co_authors):
     persondb[res["_id"]] = res
 
 
-def level_one(name):
+def level_one(name, check_cache=True):
 
-    cached_authors = cache_search(name)
-    if cached_authors is not None:
-        return cached_authors
+    if check_cache:
+        cached_authors = cache_search(name)
+        if cached_authors is not None:
+            return cached_authors
 
     mango = {
         'selector': {
@@ -49,15 +50,30 @@ def level_one(name):
 
     id_list = []
 
-    for paper in papers:
-        p = pubdb[paper]
-        ids = p["authored-by"]
+    requests = list(map(lambda i: {"id": i}, papers))
+
+    _,_,paper_response = pubdb.resource.post_json('_bulk_get', {'docs': requests})
+
+    for paper in paper_response['results']:
+        d = paper.get('docs')[0].get('ok')
+        if d is None:
+            break
+        ids = d.get('authored-by')
         id_list.extend(ids)
 
     co_authors = set()
 
-    for i in id_list:
-        n = persondb[i].get("name")
+    requests = list(map(lambda i: {"id": i}, id_list))
+
+    _,_,author_response = persondb.resource.post_json('_bulk_get', {'docs': requests})
+
+    for person in author_response['results']:
+        d = person.get('docs')[0].get('ok')
+        if d is None:
+            break
+        n = d.get('name')
+        if n is None:
+            break
         co_authors.add(n)
 
     co_authors.remove(name)
@@ -85,4 +101,4 @@ def level_n(name, n):
     levels = level_n_recurse(name, n)
     return levels[n]
 
-print(len(level_n("Michael Stonebraker", 3)))
+print(len(level_n("Barton C. Massey", 3)))
